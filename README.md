@@ -1,4 +1,4 @@
-# 🏠 Exploration SQL — Portefeuille Assurances Habitation
+# 🏠 Exploration SQL : Portefeuille Assurances Habitation
 
 ![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=postgresql&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
@@ -11,7 +11,7 @@
 
 ## 📖 Contexte
 
-Une compagnie d'assurance habitation veut exploiter sa base de données pour piloter sa stratégie commerciale. Les équipes métier posent des questions précises — l'analyse SQL doit y répondre avec des chiffres actionnables.
+Une compagnie d'assurance habitation veut exploiter sa base de données pour piloter sa stratégie commerciale. Les équipes métier posent des questions précises, l'analyse SQL doit y répondre avec des chiffres actionnables.
 
 **La question centrale :** Où se trouvent les leviers de croissance dans un portefeuille de 50 000 contrats ?
 
@@ -242,9 +242,9 @@ Data Analyst | 10 ans d'expérience Business (retail + e-commerce) → Reconvers
 
 ## 🔗 Autres projets
 
-- [Prévision SARIMA des ventes e-commerce](https://github.com/Heltondsm/ecommerce-sales-analysis-sarima) — Séries temporelles, grid search sur 64 modèles, RMSE ±12%
-- [Sous-nutrition mondiale — Données FAO](https://github.com/Heltondsm/etude-sante-publique-fao) — Python, 4 datasets, 528M personnes, conclusion : problème de distribution
-- [Performance e-commerce — Le Grand Marché](https://github.com/Heltondsm/analyse-ventes-ecommerce) — Excel, KPIs, trafic ×30, segmentation 2 profils
+- [Prévision SARIMA des ventes e-commerce](https://github.com/Heltondsm/ecommerce-sales-analysis-sarima), Séries temporelles, grid search sur 64 modèles, RMSE ±12%
+- [Sous-nutrition mondiale, Données FAO](https://github.com/Heltondsm/etude-sante-publique-fao), Python, 4 datasets, 528M personnes, conclusion : problème de distribution
+- [Performance e-commerce, Le Grand Marché](https://github.com/Heltondsm/analyse-ventes-ecommerce), Excel, KPIs, trafic ×30, segmentation 2 profils
 
 ---
 
