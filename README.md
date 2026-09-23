@@ -232,7 +232,7 @@ LIMIT 10;
 ## 📧 Contact
 
 **Helton Dos Santos Moreira**
-Data Analyst | 10 ans d'expérience Business (retail + e-commerce) → Reconversion Data
+Data Analyst / Data Engineer | 10 ans d'expérience business (retail et e-commerce)
 
 - 📧 Email : heltonmail8@gmail.com
 - 💼 LinkedIn : [in/helton-dsm-data](https://linkedin.com/in/helton-dsm-data)
@@ -242,9 +242,9 @@ Data Analyst | 10 ans d'expérience Business (retail + e-commerce) → Reconvers
 
 ## 🔗 Autres projets
 
-- [Prévision SARIMA des ventes e-commerce](https://github.com/Heltondsm/ecommerce-sales-analysis-sarima), Séries temporelles, grid search sur 64 modèles, RMSE ±12%
-- [Sous-nutrition mondiale, Données FAO](https://github.com/Heltondsm/etude-sante-publique-fao), Python, 4 datasets, 528M personnes, conclusion : problème de distribution
-- [Performance e-commerce, Le Grand Marché](https://github.com/Heltondsm/analyse-ventes-ecommerce), Excel, KPIs, trafic ×30, segmentation 2 profils
+- [Pipeline dbt : profils sociodémographiques](https://github.com/Heltondsm/dbt-demographics-pipeline), Snowflake et DuckDB, 26 tests, reproductible en une commande
+- [Tendances du streaming musical : tests statistiques et Prophet](https://github.com/Heltondsm/analyse-streaming-musical), 114 000 morceaux Spotify, 3 tests avec leur taille d'effet, prévision confrontée à un modèle naïf
+- [Pipeline de veille du marché de l'emploi](https://github.com/Heltondsm/job-market-pipeline), APIs France Travail et INSEE Sirene, 698 offres et 1 166 entreprises en 11 secondes
 
 ---
 
