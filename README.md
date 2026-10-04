@@ -1,119 +1,105 @@
-# 🏠 Exploration SQL : Portefeuille Assurances Habitation
+# 🏠 Assurance habitation : où sont les clients, et qu'est-ce qui fait le prix ?
 
-![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=postgresql&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
-![DB%20Browser](https://img.shields.io/badge/DB_Browser-003B57?style=flat-square&logo=sqlite&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Completed-22c55e?style=flat-square)
-
-50 000+ contrats d'assurance habitation. Requêtes complexes (jointures, agrégations, sous-requêtes, vues) pour répondre aux questions business : quels profils coûtent le plus cher ? Quelles régions concentrent le CA ? Où sont les opportunités de croissance ?
+Une base de **30 326 contrats** conçue de A à Z, puis interrogée en SQL pour répondre aux questions d'un assureur habitation. Résultat principal : **à Paris, la cotisation moyenne est 2,3 fois plus élevée qu'ailleurs, pour des logements plus petits.** C'est l'adresse qui fait le prix, pas la surface.
 
 ---
 
-## 📖 Contexte
+## 📖 Le problème
 
-Une compagnie d'assurance habitation veut exploiter sa base de données pour piloter sa stratégie commerciale. Les équipes métier posent des questions précises, l'analyse SQL doit y répondre avec des chiffres actionnables.
-
-**La question centrale :** Où se trouvent les leviers de croissance dans un portefeuille de 50 000 contrats ?
+Un assureur habitation veut mieux connaître son portefeuille pour mieux accompagner ses clients. Ses données sont dans deux fichiers plats : les contrats d'un côté, le référentiel géographique des communes françaises de l'autre (data.gouv.fr). Impossible de répondre vite à une question simple comme « combien de contrats en Pays de la Loire, et à quel prix ? ».
 
 ---
 
-## 🎯 Objectifs
+## 🛠️ Ma solution
 
-- Identifier les régions les plus rentables
-- Analyser la répartition géographique des contrats
-- Segmenter les clients par profil de risque
-- Formuler des recommandations stratégiques
+1. **Un dictionnaire des données** : chaque colonne décrite, avec son type et ses contraintes
+2. **Un schéma relationnel normalisé** : deux tables, `contrat` et `region`, reliées par le code commune
+3. **Une base SQLite** créée et chargée : 30 326 contrats et 38 916 communes
+4. **12 requêtes métier** : filtres, agrégations, jointures, regroupements et classements
+
+![Schéma relationnel](images/schema_relationnel.png)
 
 ---
 
-## 🔍 Résultats clés
+## 🔍 Ce que la base révèle
 
-### 1️⃣ Concentration géographique
+### 1️⃣ Près d'un contrat sur deux est en Île-de-France
 
-**Top 3 départements par nombre de contrats :**
-- Paris (75) : 8 542 contrats (17,1%)
-- Hauts-de-Seine (92) : 6 234 contrats (12,5%)
-- Nord (59) : 4 891 contrats (9,8%)
+| Région | Contrats | Part |
+|---|---|---|
+| Île-de-France | 14 177 | **46,7 %** |
+| Provence-Alpes-Côte d'Azur | 3 279 | 10,8 % |
+| Auvergne-Rhône-Alpes | 3 042 | 10,0 % |
+| Nouvelle-Aquitaine | 2 038 | 6,7 % |
+| Occitanie | 1 609 | 5,3 % |
 
-### 2️⃣ Profil des assurés
+Les 4 communes qui comptent le plus de contrats sont des arrondissements parisiens : le 18e (515), le 17e (468), le 15e (407) et le 16e (394).
 
-- **88%** de maisons vs 12% d'appartements
-- Surface moyenne : **98 m²**
-- Cotisation moyenne : **342 € / an**
-
-### 3️⃣ Segmentation par formule
+### 2️⃣ L'adresse pèse plus que la surface dans le prix
 
 ```sql
--- Répartition des formules d'assurance
-SELECT
-    formule,
-    COUNT(*) as nb_contrats,
-    ROUND(AVG(cotisation), 2) as cotisation_moyenne,
-    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM Contrat), 2) as pourcentage
-FROM Contrat
-GROUP BY formule
-ORDER BY nb_contrats DESC;
-
-/* Résultats :
-Formule Standard : 32 456 contrats (64,9%) - 298€/an
-Formule Premium  : 12 891 contrats (25,8%) - 487€/an
-Formule Eco      :  4 653 contrats (9,3%)  - 189€/an
-*/
+-- Les 10 départements où la cotisation moyenne est la plus élevée
+SELECT r.dep_code,
+       r.dep_nom,
+       ROUND(AVG(c.Prix_cotisation_mensuel), 2) AS cotisation_moyenne
+FROM contrat c
+JOIN region r ON c.Code_dep_code_commune = r.Code_dep_code_commune
+GROUP BY r.dep_code, r.dep_nom
+ORDER BY cotisation_moyenne DESC
+LIMIT 10;
 ```
 
+| Département | Cotisation moyenne par mois |
+|---|---|
+| Paris (75) | **36,40 €** |
+| Hauts-de-Seine (92) | 26,27 € |
+| Val-de-Marne (94) | 19,82 € |
+| Yvelines (78) | 18,89 € |
+| Rhône (69) | 18,49 € |
+
+À Paris, un contrat coûte en moyenne **36,40 € par mois pour 51,8 m²**. Hors de Paris : **16,10 € pour 59,7 m²**. On paie 2,3 fois plus cher pour un logement plus petit.
+
+### 3️⃣ Un portefeuille d'appartements et de résidences principales
+
+- **91,8 %** des contrats couvrent un appartement, 8,2 % une maison
+- **84,5 %** sont des résidences principales (25 612 contrats)
+- **75 %** des biens assurés sont déclarés à moins de 25 000 €
+- Les deux formules se partagent le portefeuille à parts presque égales : Classique (50,5 %) et Intégral (49,5 %)
+- Au total, **7,03 millions d'euros** de cotisations par an
+
 ---
 
-## 💡 Conclusion
+## 💡 Ce que ça permet de décider
 
-> **Les contrats sont fortement concentrés en Île-de-France (45% du portefeuille) avec un potentiel d'expansion en régions sous-représentées.**
-
-**Insights clés :**
-1. Concentration géographique : 3 départements = 40% du CA
-2. Opportunité premium : 25% des clients acceptent +63% de cotisation
-3. Marché maisons sous-exploité : 88% des contrats mais potentiel appartements urbains
+- **Concentrer l'effort commercial là où sont les clients** : l'Île-de-France porte près de la moitié du portefeuille
+- **Revoir la tarification sur des critères de localisation**, puisque c'est elle qui explique les écarts de prix, bien plus que la surface
+- **Cibler l'offre sur le cœur du portefeuille** : des appartements en résidence principale, avec des biens de moins de 25 000 €
 
 ---
 
-## 📋 Recommandations business
+## 📋 Les 12 requêtes
 
-### 🚨 Court terme (0-6 mois)
-
-**1. Campagne ciblée Île-de-France**
-- Concentrer acquisition sur Paris (75), Hauts-de-Seine (92), Val-de-Marne (94)
-- Budget prioritaire : 60% IDF, 40% reste France
-- **Impact estimé :** +15% nouveaux contrats
-
-### 🎯 Moyen terme (6-12 mois)
-
-**2. Montée en gamme formule Premium**
-- 26% des clients déjà en Premium (forte acceptation)
-- Cibler clients Standard avec surface >120m² (potentiel +63% CA/client)
-- **Impact estimé :** +8% CA sans acquisition
-
-**3. Expansion géographique**
-- Régions sous-représentées : Bretagne, Pays de la Loire, PACA
-- Partenariats agences locales
-- **Impact estimé :** +2500 contrats/an
-
-### 🌱 Long terme (12-24 mois)
-
-**4. Segmentation par risque**
-- Créer scoring basé sur : département, surface, type local
-- Ajuster cotisations par profil de risque
-- **Impact estimé :** Optimisation marge +5%
-
-**5. Offre appartements urbains**
-- Actuellement 12% du portefeuille seulement
-- Produit dédié jeunes actifs urbains (Formule Eco+)
-- **Impact estimé :** Nouveau segment +3000 contrats/an
+| # | Question métier | Résultat |
+|---|---|---|
+| 1 | Contrats et surfaces du code postal 92100 | 98 contrats |
+| 2 | Liste des régions de France | 19 régions |
+| 3 | Contrats sur des résidences principales | 25 612 |
+| 4 | Les 5 plus grandes surfaces assurées | de 559 à 815 m² |
+| 5 | Cotisation mensuelle moyenne | 19,33 € |
+| 6 | Contrats par tranche de valeur déclarée | 22 712 sous 25 000 € |
+| 7 | Formules Intégral en Pays de la Loire | 589 |
+| 8 | Maisons assurées dans le département 71 | 4 contrats |
+| 9 | Surface moyenne à Paris | 51,8 m² |
+| 10 | Top 10 des départements par cotisation | Paris en tête, 36,40 € |
+| 11 | Communes avec au moins 150 contrats | 20 communes |
+| 12 | Contrats par région | Île-de-France en tête, 14 177 |
 
 ---
 
 ## 🛠️ Technologies
 
 - **SQLite** : base de données relationnelle
-- **SQL** : requêtes d'analyse (jointures, agrégations, sous-requêtes)
-- **DB Browser for SQLite** : interface de gestion
+- **SQL** : filtres, agrégations, jointures, `GROUP BY`, `HAVING`, `ORDER BY`
 
 ---
 
@@ -121,131 +107,17 @@ Formule Eco      :  4 653 contrats (9,3%)  - 189€/an
 
 ```
 .
-├── README.md                      # Documentation du projet
+├── README.md
 ├── data/
-│   └── db_immobilier.db           # Base SQLite (50K+ contrats)
+│   └── db_immobilier.db               # Base SQLite : 30 326 contrats, 38 916 communes
 ├── docs/
-│   ├── requetes_sql.pdf           # Document technique avec requêtes
-│   ├── methodologie.pdf           # Méthodologie d'analyse
-│   └── dictionnaire.xlsx          # Dictionnaire des données
+│   ├── dictionnaire_donnees.xlsx      # Dictionnaire des données
+│   ├── document_technique.pdf         # Les 12 requêtes et leurs résultats
+│   └── methodologie_exploration.pdf   # La démarche, étape par étape
 └── images/
-    └── schema_relationnel.png     # Schéma de la base
+    └── schema_relationnel.png         # Schéma de la base
 ```
 
 ---
 
-## 🚀 Installation et utilisation
-
-### Prérequis
-
-```bash
-# Télécharger DB Browser for SQLite
-https://sqlitebrowser.org/
-```
-
-### Lancer l'analyse
-
-```bash
-git clone https://github.com/Heltondsm/sql-assurances-habitation.git
-cd sql-assurances-habitation
-
-# Ouvrir la base avec DB Browser
-open data/db_immobilier.db  # macOS
-# ou double-clic sur db_immobilier.db (Windows/Linux)
-```
-
----
-
-## 📊 Aperçu du code SQL
-
-### Analyse géographique
-
-```sql
--- Top 10 départements par nombre de contrats
-SELECT
-    r.nom_departement,
-    COUNT(c.id_contrat) as nb_contrats,
-    ROUND(AVG(c.cotisation), 2) as cotisation_moyenne,
-    ROUND(SUM(c.cotisation), 2) as ca_total
-FROM Contrat c
-INNER JOIN Region r ON c.Code_dep_code_commune = r.Code_dep_code_commune
-GROUP BY r.nom_departement
-ORDER BY nb_contrats DESC
-LIMIT 10;
-```
-
-### Segmentation par surface
-
-```sql
--- Répartition des contrats par tranche de surface
-SELECT
-    CASE
-        WHEN surface < 50 THEN '< 50 m²'
-        WHEN surface BETWEEN 50 AND 100 THEN '50-100 m²'
-        WHEN surface BETWEEN 100 AND 150 THEN '100-150 m²'
-        ELSE '> 150 m²'
-    END as tranche_surface,
-    COUNT(*) as nb_contrats,
-    ROUND(AVG(cotisation), 2) as cotisation_moyenne
-FROM Contrat
-GROUP BY tranche_surface
-ORDER BY cotisation_moyenne DESC;
-```
-
-### Analyse de rentabilité
-
-```sql
--- Départements les plus rentables (CA par contrat)
-SELECT
-    r.nom_departement,
-    COUNT(c.id_contrat) as nb_contrats,
-    ROUND(SUM(c.cotisation) / COUNT(c.id_contrat), 2) as ca_par_contrat,
-    ROUND(SUM(c.cotisation), 2) as ca_total
-FROM Contrat c
-INNER JOIN Region r ON c.Code_dep_code_commune = r.Code_dep_code_commune
-GROUP BY r.nom_departement
-HAVING nb_contrats >= 100  -- Départements significatifs seulement
-ORDER BY ca_par_contrat DESC
-LIMIT 10;
-```
-
----
-
-## 📈 Compétences démontrées
-
-### Techniques SQL
-- ✅ Requêtes complexes (SELECT, WHERE, ORDER BY, LIMIT)
-- ✅ Jointures entre tables (INNER JOIN)
-- ✅ Agrégations (COUNT, SUM, AVG, MIN, MAX)
-- ✅ Regroupements conditionnels (GROUP BY, HAVING)
-- ✅ Sous-requêtes et requêtes imbriquées
-- ✅ CASE statements pour segmentation
-
-### Business acumen
-- ✅ Traduction de questions business en requêtes SQL
-- ✅ Identification d'opportunités de croissance
-- ✅ Recommandations stratégiques chiffrées
-- ✅ Segmentation clients et analyse de rentabilité
-
----
-
-## 📧 Contact
-
-**Helton Dos Santos Moreira**
-Data Analyst / Data Engineer | 10 ans d'expérience business (retail et e-commerce)
-
-- 📧 Email : heltonmail8@gmail.com
-- 💼 LinkedIn : [in/helton-dsm-data](https://linkedin.com/in/helton-dsm-data)
-- 🐙 GitHub : [Heltondsm](https://github.com/Heltondsm)
-
----
-
-## 🔗 Autres projets
-
-- [Pipeline dbt : profils sociodémographiques](https://github.com/Heltondsm/dbt-demographics-pipeline), Snowflake et DuckDB, 26 tests, reproductible en une commande
-- [Tendances du streaming musical : tests statistiques et Prophet](https://github.com/Heltondsm/analyse-streaming-musical), 114 000 morceaux Spotify, 3 tests avec leur taille d'effet, prévision confrontée à un modèle naïf
-- [Pipeline de veille du marché de l'emploi](https://github.com/Heltondsm/job-market-pipeline), APIs France Travail et INSEE Sirene, 698 offres et 1 166 entreprises en 11 secondes
-
----
-
-**Projet réalisé en février 2026**
+*Projet réalisé dans le cadre du Bachelor Data Analyst d'OpenClassrooms.*
