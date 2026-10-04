@@ -1,4 +1,4 @@
-# 🏠 Assurance habitation : où sont les clients, et qu'est-ce qui fait le prix ?
+# 🏠 Facteurs de tarification en assurance habitation : analyse SQL
 
 Une base de **30 326 contrats** conçue de A à Z, puis interrogée en SQL pour répondre aux questions d'un assureur habitation. Résultat principal : **à Paris, la cotisation moyenne est 2,3 fois plus élevée qu'ailleurs, pour des logements plus petits.** C'est l'adresse qui fait le prix, pas la surface.
 
