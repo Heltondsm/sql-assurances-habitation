@@ -1,5 +1,10 @@
 # 🏠 Facteurs de tarification en assurance habitation : analyse SQL
 
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=postgresql&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white)
+![Modélisation](https://img.shields.io/badge/Mod%C3%A9lisation%20des%20donn%C3%A9es-6366f1?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Completed-22c55e?style=flat-square)
+
 Une base de **30 326 contrats** conçue de A à Z, puis interrogée en SQL pour répondre aux questions d'un assureur habitation. Résultat principal : **à Paris, la cotisation moyenne est 2,3 fois plus élevée qu'ailleurs, pour des logements plus petits.** C'est l'adresse qui fait le prix, pas la surface.
 
 ---
@@ -120,4 +125,64 @@ LIMIT 10;
 
 ---
 
-*Projet réalisé dans le cadre du Bachelor Data Analyst d'OpenClassrooms.*
+## 🚀 Ouvrir la base
+
+```bash
+git clone https://github.com/Heltondsm/sql-assurances-habitation.git
+cd sql-assurances-habitation
+sqlite3 data/db_immobilier.db
+```
+
+```sql
+-- Cotisation mensuelle moyenne et surface moyenne, Paris contre le reste de la France
+SELECT CASE WHEN r.dep_code = '75' THEN 'Paris' ELSE 'Hors Paris' END AS zone,
+       ROUND(AVG(c.Prix_cotisation_mensuel), 2) AS cotisation_moyenne,
+       ROUND(AVG(c.Surface), 1)                 AS surface_moyenne
+FROM contrat c
+JOIN region r ON c.Code_dep_code_commune = r.Code_dep_code_commune
+GROUP BY zone;
+```
+
+---
+
+## 📈 Compétences démontrées
+
+### Modélisation des données
+- ✅ Dictionnaire des données : chaque colonne décrite avec son type et ses contraintes
+- ✅ Schéma relationnel normalisé en deux tables reliées par le code commune
+- ✅ Base SQLite créée et chargée : 30 326 contrats et 38 916 communes
+
+### SQL
+- ✅ 12 requêtes métier : filtres, agrégations, jointures, `GROUP BY`, `HAVING`, classements
+- ✅ Chaque question posée en français avant d'être traduite en requête
+
+### Restitution
+- ✅ Document technique avec les 12 requêtes et leurs résultats
+- ✅ Trois décisions proposées à l'assureur : ciblage commercial, tarification, cœur d'offre
+
+---
+
+## 📧 Contact
+
+**Helton Dos Santos Moreira**
+Data Analyst | 10 ans d'expérience business (retail et e-commerce)
+
+- 📧 Email : heltonmail8@gmail.com
+- 💼 LinkedIn : [in/helton-dsm-data](https://linkedin.com/in/helton-dsm-data)
+- 🐙 GitHub : [Heltondsm](https://github.com/Heltondsm)
+- 🌐 Portfolio : [heltondsm.github.io](https://heltondsm.github.io/)
+
+---
+
+## 🔗 Autres projets
+
+- [CRM data et agents IA : centraliser opportunités, contacts et échanges](https://github.com/Heltondsm/crm-data-agents-ia), PostgreSQL alimenté par des API, collecte Python planifiée, opportunités notées par IA, testé automatiquement à chaque push
+- [Étude de marché par clustering : choisir les pays où exporter de la volaille bio](https://github.com/Heltondsm/python-etude-marche-clustering-pays), ACP, CAH et k-means sur 170 pays, 4 familles, 3 marchés prioritaires
+- [Tableau de bord Power BI : portefeuille de projets](https://github.com/Heltondsm/powerbi-portefeuille-projets-rls), 104 projets dans 52 pays, sécurité au niveau des lignes sur 3 rôles, 25 mesures DAX
+- [Audit de la qualité des données d'un catalogue e-commerce](https://github.com/Heltondsm/python-audit-donnees-catalogue), 3 sources réconciliées, 9 anomalies, 276 859 € de stock valorisé
+- [Pipeline dbt : profils sociodémographiques](https://github.com/Heltondsm/dbt-demographics-pipeline), Snowflake et DuckDB, 26 tests, reproductible en une commande
+
+---
+
+**Projet réalisé en février 2026**
+
